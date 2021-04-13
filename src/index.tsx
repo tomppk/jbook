@@ -1,5 +1,5 @@
-import ReactDOM from 'react-dom';
 import { useState } from 'react';
+import ReactDOM from 'react-dom';
 
 // <pre> element formats code nicely and makes it look like code
 const App = () => {
@@ -14,7 +14,8 @@ const App = () => {
     setInput(event.target.value);
   };
 
-  const onClick = () => {
+  //
+  const onClick = (): void => {
     console.log(input);
   };
 
