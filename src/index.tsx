@@ -39,13 +39,24 @@ const App = () => {
     setInput(event.target.value);
   };
 
-  //
-  const onClick = (): void => {
+  // Check that there is ref.current so esbuild service has been initialized
+  // Call esbuild method transform with user input which transpiles code
+  // ref.current.transform() method is async so use async/await
+  const onClick = async () => {
     if (!ref.current) {
       return;
     }
 
-    console.log(ref.current);
+    // First argument input code to be transpiled
+    // Second argument config object. Loader determines type of code we expect
+    // input to be so javascript with jsx.
+    // Target specifies the environment or version of code generated
+    // Returns result object with property code we want to display
+    const result = await ref.current.transform(input, {
+      loader: 'jsx',
+      target: 'es2015',
+    });
+    setCode(result.code);
   };
 
   return (
