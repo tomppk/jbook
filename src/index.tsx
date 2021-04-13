@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild-wasm';
 import { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
 
 // <pre> element formats code nicely and makes it look like code
 const App = () => {
@@ -47,16 +48,30 @@ const App = () => {
       return;
     }
 
+    // TRANSPILE
     // First argument input code to be transpiled
     // Second argument config object. Loader determines type of code we expect
     // input to be so javascript with jsx.
     // Target specifies the environment or version of code generated
     // Returns result object with property code we want to display
-    const result = await ref.current.transform(input, {
-      loader: 'jsx',
-      target: 'es2015',
+    // const result = await ref.current.transform(input, {
+    //   loader: 'jsx',
+    //   target: 'es2015',
+    // });
+
+    // BUNDLE
+    // First argument config object to give instructions on
+    // bundling code.
+    // Entrypoint defines the first file we want to be bundled
+    const result = await ref.current.build({
+      entryPoints: ['index.js'],
+      bundle: true,
+      write: false,
+      plugins: [unpkgPathPlugin()],
     });
-    setCode(result.code);
+    // console.log(result);
+
+    setCode(result.outputFiles[0].text);
   };
 
   return (
