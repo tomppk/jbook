@@ -15,6 +15,10 @@ export const unpkgPathPlugin = () => {
       // event hanlder to listen for onResolve event of build process
       // overrides the default process of esbuild of figuring out where to find
       // file
+      // filter: regular expression controls when onResolve and onLoad are
+      // executed. filter applied against the filename we are going to load.
+      // namespace: is used to flag files we want onResolve and onLoad to be
+      // applied to. Can have many files with different namespaces
       build.onResolve({ filter: /.*/ }, async (args: any) => {
         console.log('onResole', args);
         return { path: args.path, namespace: 'a' };
@@ -34,14 +38,9 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              import message from './message';
+              import message from 'tiny-test-pkg';
               console.log(message);
             `,
-          };
-        } else {
-          return {
-            loader: 'jsx',
-            contents: 'export default "hi there!"',
           };
         }
       });
