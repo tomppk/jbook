@@ -63,11 +63,22 @@ const App = () => {
     // First argument config object to give instructions on
     // bundling code.
     // Entrypoint defines the first file we want to be bundled
+    // define: lets us replace global identifiers with constant expressions
+    // so when bundling code the bundler encounters 'process.env.NODE_ENV' it is
+    // replaced with a string "production" to get a string double quotes is used
+    // '"string"'
+    // If find variable global replace it with variable window (not string)
+    // This is done as some modules or packages require global variable window to
+    // function properly
     const result = await ref.current.build({
       entryPoints: ['index.js'],
       bundle: true,
       write: false,
       plugins: [unpkgPathPlugin()],
+      define: {
+        'process.env.NODE_ENV': '"production"',
+        global: 'window',
+      },
     });
     // console.log(result);
 
