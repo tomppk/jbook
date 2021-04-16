@@ -35,13 +35,16 @@ export const unpkgPathPlugin = () => {
         // combine URL
         // First argument path we want to add to root url
         // Second argument root url we want to add the first argument to
-        // We get the root url from args.importer property which is the filepath
-        // that tries to import the module/package eg. 'index.js' or
-        // "https://unpkg.com/medium-test-pkg" where we add /utils
+        // We get the root url from args.resolveDir property which is the filepath
+        // or url where ESbuild found earlier file eg. index.js
+        // "https://unpkg.com/medium-test-pkg/src/helpers" where we add /utils
         if (args.path.includes('./') || args.path.includes('../')) {
           return {
             namespace: 'a',
-            path: new URL(args.path, args.importer + '/').href,
+            path: new URL(
+              args.path,
+              'https://unpkg.com' + args.resolveDir + '/'
+            ).href,
           };
         }
 
@@ -72,18 +75,28 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              const message = require('medium-test-pkg');
+              const message = require('nested-test-pkg');
               console.log(message);
             `,
           };
         }
         // Make GET request to unpkg.com and extract data property from response
         // Return object with structure ESbuild can understand so loader to determine
-        // type of data or code and contents
-        const { data } = await axios.get(args.path);
+        // type of data or code and contents.
+        // resolveDir or resolveDirectory is going to provided to the next file
+        // we are going to require or import. It is going to describe the path
+        // where we found earlier file eg. 'nested-test-pkg'
+        // We get the path by creating a new URL object and accessing its
+        // pathname property.
+        // We get the rootURL for earlier file from request.responseURL property
+        // './' is added to get path "/nested-test-pkg@1.0.0/src/"
+        // if not added then we get ""..src/index.js"
+        const { data, request } = await axios.get(args.path);
+        console.log(request);
         return {
           loader: 'jsx',
           contents: data,
+          resolveDir: new URL('./', request.responseURL).pathname,
         };
       });
     },
