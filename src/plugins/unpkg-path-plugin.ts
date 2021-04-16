@@ -26,13 +26,35 @@ export const unpkgPathPlugin = () => {
         console.log('onResolve', args);
         if (args.path === 'index.js') {
           return { path: args.path, namespace: 'a' };
-        } else if (args.path === 'tiny-test-pkg') {
+        }
+
+        // args.path eg. 'index.js' or relative path './utils' '../utils' etc.
+        // If args.path includes relative path we use special URL constructor
+        // for browsers to create a url path where to retrieve package
+        // Create a new URL object and access its href property which is the whole
+        // combine URL
+        // First argument path we want to add to root url
+        // Second argument root url we want to add the first argument to
+        // We get the root url from args.importer property which is the filepath
+        // that tries to import the module/package eg. 'index.js' or
+        // "https://unpkg.com/medium-test-pkg" where we add /utils
+        if (args.path.includes('./') || args.path.includes('../')) {
           return {
-            path: 'https://unpkg.com/tiny-test-pkg@1.0.0/index.js',
             namespace: 'a',
+            path: new URL(args.path, args.importer + '/').href,
           };
         }
+
+        // If args.path other than 'index.js' we assume that it is the name of
+        // the package we want to fetch from unpkg.com api and use it to create
+        // url path
+        return {
+          namespace: 'a',
+          path: `https://unpkg.com/${args.path}`,
+        };
       });
+
+      // onLoad is called when ESbuild is trying to fetch the contents of a file
       // event handler to listen for onLoad event of build process
       // overrides esbuilds default way of loading up a file which is to read it
       // from a file system
@@ -50,7 +72,7 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              const message = require('tiny-test-pkg');
+              const message = require('medium-test-pkg');
               console.log(message);
             `,
           };
