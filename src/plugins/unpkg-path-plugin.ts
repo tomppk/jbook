@@ -30,12 +30,27 @@ export const unpkgPathPlugin = (inputCode: string) => {
       // executed. filter applied against the filename we are going to load.
       // namespace: is used to flag files we want onResolve and onLoad to be
       // applied to. Can have many files with different namespaces
-      build.onResolve({ filter: /.*/ }, async (args: any) => {
-        console.log('onResolve', args);
-        if (args.path === 'index.js') {
-          return { path: args.path, namespace: 'a' };
-        }
 
+      // Filter to look for file that is exactly index.js written in regular
+      // expression. When find that file run callback function
+      // Handle root entry file of 'index.js'
+      build.onResolve({ filter: /(^index\.js$)/ }, () => {
+        return { path: 'index.js', namespace: 'a' };
+      });
+
+      // Filter to check if the filepath we are looking for is a relative path
+      // ie. like ./ or ../
+      // Handle relative paths in a module
+      build.onResolve({ filter: /^\.+\// }, (args: any) => {
+        return {
+          namespace: 'a',
+          path: new URL(args.path, 'https://unpkg.com' + args.resolveDir + '/')
+            .href,
+        };
+      });
+
+      // Handle main file of a module
+      build.onResolve({ filter: /.*/ }, async (args: any) => {
         // args.path eg. 'index.js' or relative path './utils' '../utils' etc.
         // If args.path includes relative path we use special URL constructor
         // for browsers to create a url path where to retrieve package
@@ -46,15 +61,6 @@ export const unpkgPathPlugin = (inputCode: string) => {
         // We get the root url from args.resolveDir property which is the filepath
         // or url where ESbuild found earlier file eg. index.js
         // "https://unpkg.com/medium-test-pkg/src/helpers" where we add /utils
-        if (args.path.includes('./') || args.path.includes('../')) {
-          return {
-            namespace: 'a',
-            path: new URL(
-              args.path,
-              'https://unpkg.com' + args.resolveDir + '/'
-            ).href,
-          };
-        }
 
         // If args.path other than 'index.js' we assume that it is the name of
         // the package we want to fetch from unpkg.com api and use it to create
