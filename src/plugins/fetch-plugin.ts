@@ -19,20 +19,28 @@ export const fetchPlugin = (inputCode: string) => {
       // from a file system
       // Instead do not load up the file from file system but receive it as an
       // object that has the contents of the file esbuild was trying to load
-      build.onLoad({ filter: /.*/ }, async (args: any) => {
-        console.log('onLoad', args);
 
-        // If esbuild tries to load index.js file do not let it do it and load
-        // up something from file system but instead it is loaded here already
-        // inside object
-        // loader property: 'jsx' informs ESbuild that contents might include
-        // 'jsx' and it knows then to parse it properly
-        if (args.path === 'index.js') {
-          return {
-            loader: 'jsx',
-            contents: inputCode,
-          };
-        }
+      // onLoad() function is only going to run for file that matches the filter
+      // regular expression so for file that is named exactly index.js
+
+      // If esbuild tries to load index.js file do not let it do it and load
+      // up something from file system but instead it is loaded here already
+      // inside object
+      // loader property: 'jsx' informs ESbuild that contents might include
+      // 'jsx' and it knows then to parse it properly
+      build.onLoad({ filter: /(^index\.js$)/ }, () => {
+        return {
+          loader: 'jsx',
+          contents: inputCode,
+        };
+      });
+
+      // onLoad to check for all files if we already have retrieved that file.
+      // If we have then return that file. No need to continue below to other
+      // onLoad functions as we already have the file.
+      // If we do not have a cached result then move to other onLoads to fetch
+      // .css and .js and other files
+      build.onLoad({ filter: /.*/ }, async (args: any) => {
         // Check to see if we have already fetched this file and if it is
         // in the cache. If not fetched will get null or undefined.
         // Add correct type so Typescript knows what type the result should be
@@ -46,7 +54,10 @@ export const fetchPlugin = (inputCode: string) => {
         if (cachedResult) {
           return cachedResult;
         }
+      });
 
+      // Use this onLoad for file ending in .css
+      build.onLoad({ filter: /.css$/ }, async (args: any) => {
         // Make GET request to unpkg.com and extract data property from response
         // Return object with structure ESbuild can understand so loader to determine
         // type of data or code and contents.
@@ -60,12 +71,6 @@ export const fetchPlugin = (inputCode: string) => {
         // if not added then we get ""..src/index.js"
 
         const { data, request } = await axios.get(args.path);
-
-        // Check if args.path ends in .css and then set the loader to parse css
-        // String method match() retrieves the result of matching string against
-        // a regular expression /.css$/ is regexp for .css at the end of path
-        // Otherwise set loader to parse jsx by default
-        const fileType = args.path.match(/.css$/) ? 'css' : 'jsx';
 
         // To prevent CSS file content such as '' to escape our contents template
         // string early we replace newlines, "" and ''
@@ -82,14 +87,11 @@ export const fetchPlugin = (inputCode: string) => {
         // A workaround for this is to use Javascript to create a DOM HTML element
         // and then insert the contents of the .css file inside the DOM element
         // and then append this element into document.head to render it on screen.
-        const contents =
-          fileType === 'css'
-            ? `
+        const contents = `
           const style = document.createElement('style');
           style.innerText = '${escaped}';
           document.head.appendChild(style);
-        `
-            : data;
+        `;
 
         const result: esbuild.OnLoadResult = {
           loader: 'jsx',
@@ -99,6 +101,21 @@ export const fetchPlugin = (inputCode: string) => {
 
         // Store response in cache
         // As key set args.path and value set result object
+        await fileCache.setItem(args.path, result);
+
+        return result;
+      });
+
+      // Handle any kind of arbitrary file
+      build.onLoad({ filter: /.*/ }, async (args: any) => {
+        const { data, request } = await axios.get(args.path);
+
+        const result: esbuild.OnLoadResult = {
+          loader: 'jsx',
+          contents: data,
+          resolveDir: new URL('./', request.responseURL).pathname,
+        };
+
         await fileCache.setItem(args.path, result);
 
         return result;
