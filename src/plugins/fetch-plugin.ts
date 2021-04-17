@@ -60,9 +60,40 @@ export const fetchPlugin = (inputCode: string) => {
         // if not added then we get ""..src/index.js"
 
         const { data, request } = await axios.get(args.path);
+
+        // Check if args.path ends in .css and then set the loader to parse css
+        // String method match() retrieves the result of matching string against
+        // a regular expression /.css$/ is regexp for .css at the end of path
+        // Otherwise set loader to parse jsx by default
+        const fileType = args.path.match(/.css$/) ? 'css' : 'jsx';
+
+        // To prevent CSS file content such as '' to escape our contents template
+        // string early we replace newlines, "" and ''
+        // Use regular expressions
+        // Remove all newlines, escape all double quotes and single quotes.
+        const escaped = data
+          .replace(/\n/g, '')
+          .replace(/"/g, '\\"')
+          .replace(/'/g, "\\'");
+
+        // ESbuild cannot directly bundle .css inside a browser. It gives an error
+        // of missing output file where to store the retrieved .css contents as by
+        // default it expects to be working in a file system instead of browser.
+        // A workaround for this is to use Javascript to create a DOM HTML element
+        // and then insert the contents of the .css file inside the DOM element
+        // and then append this element into document.head to render it on screen.
+        const contents =
+          fileType === 'css'
+            ? `
+          const style = document.createElement('style');
+          style.innerText = '${escaped}';
+          document.head.appendChild(style);
+        `
+            : data;
+
         const result: esbuild.OnLoadResult = {
           loader: 'jsx',
-          contents: data,
+          contents: contents,
           resolveDir: new URL('./', request.responseURL).pathname,
         };
 
