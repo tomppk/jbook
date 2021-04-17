@@ -90,7 +90,11 @@ export const unpkgPathPlugin = () => {
         }
         // Check to see if we have already fetched this file and if it is
         // in the cache. If not fetched will get null or undefined.
-        const cachedResult = await fileCache.getItem(args.path);
+        // Add correct type so Typescript knows what type the result should be
+        // and so it will not give error of unknown type
+        const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
+          args.path
+        );
 
         // If it is, return it immediately.
         // Otherwise allow the request to occur below.
@@ -111,7 +115,7 @@ export const unpkgPathPlugin = () => {
         // if not added then we get ""..src/index.js"
 
         const { data, request } = await axios.get(args.path);
-        const result = {
+        const result: esbuild.OnLoadResult = {
           loader: 'jsx',
           contents: data,
           resolveDir: new URL('./', request.responseURL).pathname,
