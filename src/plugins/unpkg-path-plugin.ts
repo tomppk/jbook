@@ -15,7 +15,7 @@ const fileCache = localForage.createInstance({
 // filesystem or node_modules folder
 // We instead look to unpkg.com that hosts all source code for npm packages and
 // retrieve the main index.js file of needed package
-export const unpkgPathPlugin = () => {
+export const unpkgPathPlugin = (inputCode: string) => {
   return {
     // name property is for debugging purpose if have multiple plugins
     // setup function called automatically
@@ -82,10 +82,7 @@ export const unpkgPathPlugin = () => {
         if (args.path === 'index.js') {
           return {
             loader: 'jsx',
-            contents: `
-              import React, {useState} from 'react';
-              console.log(React, useState);
-            `,
+            contents: inputCode,
           };
         }
         // Check to see if we have already fetched this file and if it is
