@@ -82,7 +82,15 @@ const App = () => {
     });
     // console.log(result);
 
+    // result.outputFiles[0].text is the code string that user inputs in textarea
     setCode(result.outputFiles[0].text);
+
+    // Evaluates and executes Javascript code inside the browser
+    try {
+      eval(result.outputFiles[0].text);
+    } catch (err) {
+      alert(err);
+    }
   };
 
   return (
@@ -92,6 +100,7 @@ const App = () => {
         <button onClick={onClick}>Submit</button>
       </div>
       <pre>{code}</pre>
+      <iframe src="/test.html" sandbox="allow-same-origin" />
     </div>
   );
 };
