@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { fetchPlugin } from './plugins/fetch-plugin';
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
 import CodeEditor from './components/code-editor';
+import Preview from './components/preview';
 
 // <pre> element formats code nicely and makes it look like code
 const App = () => {
@@ -14,8 +15,8 @@ const App = () => {
   // to esbuild service object to access esbuild functionality inside our component
   const ref = useRef<any>();
 
-  // Reference to iframe element
-  const iframe = useRef<any>();
+  // Piece of state for code content inside editor
+  const [code, setCode] = useState('');
 
   // input is code that user writes into textarea
   const [input, setInput] = useState('');
@@ -49,10 +50,6 @@ const App = () => {
     if (!ref.current) {
       return;
     }
-
-    // Before rendering any new code we reset the contents or srcdoc property
-    // of iframe into our base html document defined below
-    iframe.current.srcdoc = html;
 
     // TRANSPILE
     // First argument input code to be transpiled
@@ -88,66 +85,20 @@ const App = () => {
     });
 
     // result.outputFiles[0].text is the code string that user inputs in textarea
-    // setCode(result.outputFiles[0].text);
-
-    // When the code bundling process is complete we take the reference to iframe
-    // and use that reference to emit or post a message down into the iframe
-    // The message is the code string that user inputs in textarea
-    // '*' is targetOrigin which means that target uri is any and not restricted
-    iframe.current.contentWindow.postMessage(result.outputFiles[0].text, '*');
+    setCode(result.outputFiles[0].text);
   };
 
-  // Get our code inside iframe element so it gets executed separately
-  // inside iframe with no access to outside iframe for security reasons-
-  // Add basic html and div with id="root" ready for React components to use.
-  // Add script with event listener that enables indirect communication between
-  // parent element and child iframe
-  // Event listener listens for a message from parent element that contains the
-  // user inputted code as a string inside event.data
-  // eval() evaluates and executes Javascript inside browser
-  // Incase error display error inside root div and also inside console
-  // for further investigation
-  const html = `
-    <html>
-      <head></head>
-      <body>
-        <div id="root"></div>
-        <script>
-          window.addEventListener('message', (event) => {
-            try {
-              eval(event.data)
-            } catch (err) {
-              const root = document.querySelector('#root');
-              root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + err + '</div>'
-              console.error(err);
-            }
-          }, false);
-        </script>
-      </body>
-    </html>
-  `;
-
-  // srcDoc allows us to load local string as src instead of url
-  // We generate the html content ourselves instead of fetching it
-  // if sandbox = "allow-same-origin" communication between parent element
-  // and child iframe is possible, if this is missing then they cannot communicate.
-  // If sandbox="allow-scripts" iframe can run js scripts
+  // Pass down code state to Preview component
   return (
     <div>
       <CodeEditor
         initialValue="const a = 1;"
         onChange={(value) => setInput(value)}
       />
-      <textarea value={input} onChange={onChange}></textarea>
       <div>
         <button onClick={onClick}>Submit</button>
       </div>
-      <iframe
-        title="preview"
-        ref={iframe}
-        srcDoc={html}
-        sandbox="allow-scripts"
-      />
+      <Preview code={code} />
     </div>
   );
 };
