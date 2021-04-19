@@ -133,7 +133,10 @@ const App = () => {
   // If sandbox="allow-scripts" iframe can run js scripts
   return (
     <div>
-      <CodeEditor />
+      <CodeEditor
+        initialValue="const a = 1;"
+        onChange={(value) => setInput(value)}
+      />
       <textarea value={input} onChange={onChange}></textarea>
       <div>
         <button onClick={onClick}>Submit</button>
