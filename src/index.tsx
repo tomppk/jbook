@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { fetchPlugin } from './plugins/fetch-plugin';
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
+import CodeEditor from './components/code-editor';
 
 // <pre> element formats code nicely and makes it look like code
 const App = () => {
@@ -132,6 +133,7 @@ const App = () => {
   // If sandbox="allow-scripts" iframe can run js scripts
   return (
     <div>
+      <CodeEditor />
       <textarea value={input} onChange={onChange}></textarea>
       <div>
         <button onClick={onClick}>Submit</button>
