@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild-wasm';
-import { fetchPlugin } from '../plugins/fetch-plugin';
-import { unpkgPathPlugin } from '../plugins/unpkg-path-plugin';
+import { fetchPlugin } from './plugins/fetch-plugin';
+import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
 
 // ESbuild service needs to be initialized and started only once
 // Below we check if service is not yet initialized then we initialize it
