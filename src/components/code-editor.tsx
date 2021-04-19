@@ -3,7 +3,12 @@
 
 // ctrl+click @monaco-editor to get to type definition file and see all the
 // config properties and interfaces we need to set
-import MonacoEditor from '@monaco-editor/react';
+// Import also EditorDidMount type definition or interface
+// Prettier code formatter and parser to format javascript code
+import { useRef } from 'react';
+import MonacoEditor, { EditorDidMount } from '@monaco-editor/react';
+import prettier from 'prettier';
+import parser from 'prettier/parser-babel';
 
 // Define interface to satisfy to use CodeEditor component
 interface CodeEditorProps {
@@ -21,6 +26,10 @@ interface CodeEditorProps {
 // when it is resized or adjusted.
 // Extract passed in props
 const CodeEditor: React.FC<CodeEditorProps> = ({ onChange, initialValue }) => {
+  // Get reference to actual Monaco Editor instance inside react component
+  // wrapper
+  const editorRef = useRef<any>();
+
   // Function called when editor is rendered on the screen
   // First argument function to use to get current value of text that is inside
   // the editor.
@@ -30,32 +39,63 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ onChange, initialValue }) => {
   // editor changes
   // Whenever there is change we call onChange passed by parent we are going to
   // update our input piece of state of <App> component
-  const onEditorDidMount = (getValue: () => string, monacoEditor: any) => {
+  const onEditorDidMount: EditorDidMount = (getValue, monacoEditor) => {
+    // Set current reference to instance of monacoEditor
+    editorRef.current = monacoEditor;
+
     monacoEditor.onDidChangeModelContent(() => {
       onChange(getValue());
     });
+
+    // Set editor tab press to equal two spaces
+    monacoEditor.getModel()?.updateOptions({ tabSize: 2 });
+  };
+
+  // Formats code inside editor
+  // Get current value from editor, format value, set formatted value back
+  // in the editor
+  const onFormatClick = () => {
+    // Get current text value from editor
+    const unformatted = editorRef.current.getModel().getValue();
+
+    // Format that value. Add config object to determine how to format
+    // User babel parser for JS, use spaces instead of tabs, add semicolons end of
+    // lines, use single quotes
+    const formatted = prettier.format(unformatted, {
+      parser: 'babel',
+      plugins: [parser],
+      useTabs: false,
+      semi: true,
+      singleQuote: true,
+    });
+
+    // Set the formatted value back in the editor
+    editorRef.current.setValue(formatted);
   };
 
   return (
-    <MonacoEditor
-      editorDidMount={onEditorDidMount}
-      value={initialValue}
-      theme="dark"
-      language="javascript"
-      height="500px"
-      options={{
-        wordWrap: 'on',
-        minimap: {
-          enabled: false,
-        },
-        showUnused: false,
-        folding: false,
-        lineNumbersMinChars: 3,
-        fontSize: 16,
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
-      }}
-    />
+    <div>
+      <button onClick={onFormatClick}>Format</button>
+      <MonacoEditor
+        editorDidMount={onEditorDidMount}
+        value={initialValue}
+        theme="dark"
+        language="javascript"
+        height="500px"
+        options={{
+          wordWrap: 'on',
+          minimap: {
+            enabled: false,
+          },
+          showUnused: false,
+          folding: false,
+          lineNumbersMinChars: 3,
+          fontSize: 16,
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+        }}
+      />
+    </div>
   );
 };
 
