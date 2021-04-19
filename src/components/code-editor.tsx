@@ -5,6 +5,7 @@
 // config properties and interfaces we need to set
 // Import also EditorDidMount type definition or interface
 // Prettier code formatter and parser to format javascript code
+import './code-editor.css';
 import { useRef } from 'react';
 import MonacoEditor, { EditorDidMount } from '@monaco-editor/react';
 import prettier from 'prettier';
@@ -61,21 +62,30 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ onChange, initialValue }) => {
     // Format that value. Add config object to determine how to format
     // User babel parser for JS, use spaces instead of tabs, add semicolons end of
     // lines, use single quotes
-    const formatted = prettier.format(unformatted, {
-      parser: 'babel',
-      plugins: [parser],
-      useTabs: false,
-      semi: true,
-      singleQuote: true,
-    });
+    // replace with regular expression looks for a newline character at the end
+    // text value that prettier automatically adds when formatting and replaces it
+    const formatted = prettier
+      .format(unformatted, {
+        parser: 'babel',
+        plugins: [parser],
+        useTabs: false,
+        semi: true,
+        singleQuote: true,
+      })
+      .replace(/\n$/, '');
 
     // Set the formatted value back in the editor
     editorRef.current.setValue(formatted);
   };
 
+  // Add css styling from bulma superhero style and custom css
   return (
-    <div>
-      <button onClick={onFormatClick}>Format</button>
+    <div className="editor-wrapper">
+      <button
+        className="button button-format is-primary is-small"
+        onClick={onFormatClick}>
+        Format
+      </button>
       <MonacoEditor
         editorDidMount={onEditorDidMount}
         value={initialValue}
