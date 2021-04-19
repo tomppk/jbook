@@ -16,10 +16,7 @@ const App = () => {
   const iframe = useRef<any>();
 
   // input is code that user writes into textarea
-  // code is output from ESbuild tool, so transpiled and bundled codo that user
-  //inputs. Show this code output in <pre> element
   const [input, setInput] = useState('');
-  const [code, setCode] = useState('');
 
   // Initialize esbuild service with config object.
   // wasmURL is path to esbuild webassembly binary that we fetch from unpkg.com
@@ -50,6 +47,10 @@ const App = () => {
     if (!ref.current) {
       return;
     }
+
+    // Before rendering any new code we reset the contents or srcdoc property
+    // of iframe into our base html document defined below
+    iframe.current.srcdoc = html;
 
     // TRANSPILE
     // First argument input code to be transpiled
@@ -102,6 +103,8 @@ const App = () => {
   // Event listener listens for a message from parent element that contains the
   // user inputted code as a string inside event.data
   // eval() evaluates and executes Javascript inside browser
+  // Incase error display error inside root div and also inside console
+  // for further investigation
   const html = `
     <html>
       <head></head>
@@ -109,7 +112,13 @@ const App = () => {
         <div id="root"></div>
         <script>
           window.addEventListener('message', (event) => {
-            eval(event.data)
+            try {
+              eval(event.data)
+            } catch (err) {
+              const root = document.querySelector('#root');
+              root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + err + '</div>'
+              console.error(err);
+            }
           }, false);
         </script>
       </body>
@@ -127,8 +136,12 @@ const App = () => {
       <div>
         <button onClick={onClick}>Submit</button>
       </div>
-      <pre>{code}</pre>
-      <iframe ref={iframe} srcDoc={html} sandbox="allow-scripts" />
+      <iframe
+        title="preview"
+        ref={iframe}
+        srcDoc={html}
+        sandbox="allow-scripts"
+      />
     </div>
   );
 };
