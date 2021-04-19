@@ -12,6 +12,9 @@ const App = () => {
   // to esbuild service object to access esbuild functionality inside our component
   const ref = useRef<any>();
 
+  // Reference to iframe element
+  const iframe = useRef<any>();
+
   // input is code that user writes into textarea
   // code is output from ESbuild tool, so transpiled and bundled codo that user
   //inputs. Show this code output in <pre> element
@@ -80,19 +83,44 @@ const App = () => {
         global: 'window',
       },
     });
-    // console.log(result);
 
     // result.outputFiles[0].text is the code string that user inputs in textarea
-    setCode(result.outputFiles[0].text);
+    // setCode(result.outputFiles[0].text);
 
-    // Evaluates and executes Javascript code inside the browser
-    try {
-      eval(result.outputFiles[0].text);
-    } catch (err) {
-      alert(err);
-    }
+    // When the code bundling process is complete we take the reference to iframe
+    // and use that reference to emit or post a message down into the iframe
+    // The message is the code string that user inputs in textarea
+    // '*' is targetOrigin which means that target uri is any and not restricted
+    iframe.current.contentWindow.postMessage(result.outputFiles[0].text, '*');
   };
 
+  // Get our code inside iframe element so it gets executed separately
+  // inside iframe with no access to outside iframe for security reasons-
+  // Add basic html and div with id="root" ready for React components to use.
+  // Add script with event listener that enables indirect communication between
+  // parent element and child iframe
+  // Event listener listens for a message from parent element that contains the
+  // user inputted code as a string inside event.data
+  // eval() evaluates and executes Javascript inside browser
+  const html = `
+    <html>
+      <head></head>
+      <body>
+        <div id="root"></div>
+        <script>
+          window.addEventListener('message', (event) => {
+            eval(event.data)
+          }, false);
+        </script>
+      </body>
+    </html>
+  `;
+
+  // srcDoc allows us to load local string as src instead of url
+  // We generate the html content ourselves instead of fetching it
+  // if sandbox = "allow-same-origin" communication between parent element
+  // and child iframe is possible, if this is missing then they cannot communicate.
+  // If sandbox="allow-scripts" iframe can run js scripts
   return (
     <div>
       <textarea value={input} onChange={onChange}></textarea>
@@ -100,7 +128,7 @@ const App = () => {
         <button onClick={onClick}>Submit</button>
       </div>
       <pre>{code}</pre>
-      <iframe src="/test.html" sandbox="allow-same-origin" />
+      <iframe ref={iframe} srcDoc={html} sandbox="allow-scripts" />
     </div>
   );
 };
