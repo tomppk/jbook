@@ -5,11 +5,16 @@
 // config properties and interfaces we need to set
 // Import also EditorDidMount type definition or interface
 // Prettier code formatter and parser to format javascript code
+// monaco-jsx-highlighter adds code highlighting to jsx and it uses jshift to
+// parse code and identify jsx and tell monaco-jsx where to find jsx to highlight
 import './code-editor.css';
+import './syntax.css';
 import { useRef } from 'react';
 import MonacoEditor, { EditorDidMount } from '@monaco-editor/react';
 import prettier from 'prettier';
 import parser from 'prettier/parser-babel';
+import codeShift from 'jscodeshift';
+import Highlighter from 'monaco-jsx-highlighter';
 
 // Define interface to satisfy to use CodeEditor component
 interface CodeEditorProps {
@@ -50,6 +55,28 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ onChange, initialValue }) => {
 
     // Set editor tab press to equal two spaces
     monacoEditor.getModel()?.updateOptions({ tabSize: 2 });
+
+    // Highlighter takes in first argument Monaco editor library,
+    // second argument codeShift library, third current instance of monacoEditor
+    // ts-ignore tells Typescript not to try to type check next line of code
+    // Monaco editor adds global monaco property to window element that gives
+    // access to monaco-editor library. Typescript is not aware of this so if not
+    // ignored gives error that this property does not exist
+    const highlighter = new Highlighter(
+      // @ts-ignore
+      window.monaco,
+      codeShift,
+      monacoEditor
+    );
+    // Whenever editor content changes try to apply highlighting to it
+    // Code inside comes from documentation. It just prevents logging syntax
+    // errors with every keypress when values change and are not valid syntax yet
+    highlighter.highLightOnDidChangeModelContent(
+      () => {},
+      () => {},
+      undefined,
+      () => {}
+    );
   };
 
   // Formats code inside editor
