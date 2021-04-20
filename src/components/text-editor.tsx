@@ -1,3 +1,4 @@
+import './styles/text-editor.css';
 import MDEditor from '@uiw/react-md-editor';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -39,7 +40,7 @@ const TextEditor: React.FC = () => {
   // If editing is true, render the markdown editor in edit mode.
   if (editing) {
     return (
-      <div ref={ref}>
+      <div className="text-editor" ref={ref}>
         <MDEditor />
       </div>
     );
@@ -48,7 +49,7 @@ const TextEditor: React.FC = () => {
   // If not editing render the editor in preview mode.
   // By clicking preview move back to edit mode
   return (
-    <div onClick={() => setEditing(true)}>
+    <div className="text-editor" onClick={() => setEditing(true)}>
       <MDEditor.Markdown source={'# Header'} />
     </div>
   );

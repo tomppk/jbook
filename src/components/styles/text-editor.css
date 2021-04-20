@@ -1,0 +1,32 @@
+/* Overwrite Bulma default css styling for .title class.
+MD-Editor has same .title class name which causes Bulma to try to apply styling
+inside MD-Editor edit mode. This causes edit to display incorrectly.
+Set .title style to no styling */
+.w-md-editor .title {
+  line-height: unset !important;
+  font-size: unset !important;
+  font-weight: unset !important;
+}
+
+/* Overwrite Bulma default styling for ul elements of 1.5 line-height.
+This fixes edit mode middle separator line displaying as too tall */
+.w-md-editor ul {
+  line-height: 1;
+}
+
+/* Hide MDEditor default resizer handlebar */
+.text-editor .w-md-editor-bar svg {
+  display: none;
+}
+
+/* Custom styling for MDEditor resizer handlebar to make it look like code-editor resize bars*/
+.text-editor .w-md-editor-bar {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  height: 11px;
+  cursor: row-resize;
+  background-color: #37414b;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  width: 100%;
+  position: relative;
+}
