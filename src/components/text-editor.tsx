@@ -7,6 +7,7 @@ const TextEditor: React.FC = () => {
   // inside editor div and prevent event listener closing editor
   const ref = useRef<HTMLDivElement | null>(null);
   const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState('# Header');
 
   useEffect(() => {
     // Callback to close edit mode
@@ -38,19 +39,27 @@ const TextEditor: React.FC = () => {
   }, []);
 
   // If editing is true, render the markdown editor in edit mode.
+  // Set component state to be the value of text inside editor. If there is
+  // no text inside set default to be empty string to prevent Typescript
+  // undefined error
   if (editing) {
     return (
       <div className="text-editor" ref={ref}>
-        <MDEditor />
+        <MDEditor value={value} onChange={(v) => setValue(v || '')} />
       </div>
     );
   }
 
   // If not editing render the editor in preview mode.
   // By clicking preview move back to edit mode
+  // Preview mode value is piece of state value ie. the contents of editor in
+  // edit mode
+  // Use Bulma card styling to create outline around editor
   return (
-    <div className="text-editor" onClick={() => setEditing(true)}>
-      <MDEditor.Markdown source={'# Header'} />
+    <div className="text-editor card" onClick={() => setEditing(true)}>
+      <div className="card-content">
+        <MDEditor.Markdown source={value} />
+      </div>
     </div>
   );
 };
