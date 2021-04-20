@@ -52,7 +52,12 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
     // and use that reference to emit or post a message down into the iframe
     // The message is the code string that user inputs in textarea
     // '*' is targetOrigin which means that target uri is any and not restricted
-    iframe.current.contentWindow.postMessage(code, '*');
+    // Wrap inside 50ms timeout so that the browser has enough time to actually
+    // set up event listener and post message. Otherwise browser does not have
+    // enough time to communicate between parent and child element with message
+    setTimeout(() => {
+      iframe.current.contentWindow.postMessage(code, '*');
+    }, 50);
   }, [code]);
 
   // srcDoc allows us to load local string as src instead of url

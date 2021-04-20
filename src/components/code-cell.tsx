@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CodeEditor from './code-editor';
 import Preview from './preview';
 import bundle from '../bundler';
@@ -12,13 +12,22 @@ const CodeCell = () => {
   // input is code that user writes into textarea
   const [input, setInput] = useState('');
 
+  // Run useEffect whenever input changes
+  // Use debouncing to limit the frequency of preview display refresh and code
+  // bundling to 1s
   // Pass in the code that user has inputted inside editor to bundler component
   // bundler initializes ESbuild takes in input, bundles it and returns bundled
   // code. This output is then set to code piece of state
-  const onClick = async () => {
-    const output = await bundle(input);
-    setCode(output);
-  };
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const output = await bundle(input);
+      setCode(output);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [input]);
 
   // Pass down code state to Preview component
   // Wrap content with Resizable components to enable editor and preview resizing
