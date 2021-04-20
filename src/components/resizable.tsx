@@ -1,6 +1,6 @@
 import { ResizableBox, ResizableBoxProps } from 'react-resizable';
 import { useEffect, useState } from 'react';
-import './resizable.css';
+import './styles/resizable.css';
 
 // Interface to define required props for the component
 interface ResizableProps {

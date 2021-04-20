@@ -7,8 +7,8 @@
 // Prettier code formatter and parser to format javascript code
 // monaco-jsx-highlighter adds code highlighting to jsx and it uses jshift to
 // parse code and identify jsx and tell monaco-jsx where to find jsx to highlight
-import './code-editor.css';
-import './syntax.css';
+import './styles/code-editor.css';
+import './styles/syntax.css';
 import { useRef } from 'react';
 import MonacoEditor, { EditorDidMount } from '@monaco-editor/react';
 import prettier from 'prettier';
