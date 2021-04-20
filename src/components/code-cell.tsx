@@ -2,6 +2,7 @@ import { useState } from 'react';
 import CodeEditor from './code-editor';
 import Preview from './preview';
 import bundle from '../bundler';
+import Resizable from './resizable';
 
 // Component to display one code editor and one preview window
 const CodeCell = () => {
@@ -21,16 +22,18 @@ const CodeCell = () => {
 
   // Pass down code state to Preview component
   return (
-    <div>
-      <CodeEditor
-        initialValue="const a = 1;"
-        onChange={(value) => setInput(value)}
-      />
+    <Resizable direction="vertical">
       <div>
-        <button onClick={onClick}>Submit</button>
+        <CodeEditor
+          initialValue="const a = 1;"
+          onChange={(value) => setInput(value)}
+        />
+        <div>
+          <button onClick={onClick}>Submit</button>
+        </div>
+        <Preview code={code} />
       </div>
-      <Preview code={code} />
-    </div>
+    </Resizable>
   );
 };
 
