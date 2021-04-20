@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import './preview.css';
 
 interface PreviewProps {
   code: string;
@@ -56,13 +57,17 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
   // if sandbox = "allow-same-origin" communication between parent element
   // and child iframe is possible, if this is missing then they cannot communicate.
   // If sandbox="allow-scripts" iframe can run js scripts
+  // div "preview-wrapper" used to create fake DOM element when resizing so
+  // the resizing works correctly with child element also
   return (
-    <iframe
-      title="preview"
-      ref={iframe}
-      srcDoc={html}
-      sandbox="allow-scripts"
-    />
+    <div className="preview-wrapper">
+      <iframe
+        title="preview"
+        ref={iframe}
+        srcDoc={html}
+        sandbox="allow-scripts"
+      />
+    </div>
   );
 };
 
