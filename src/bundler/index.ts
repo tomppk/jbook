@@ -22,19 +22,29 @@ const bundle = async (rawCode: string) => {
     });
   }
 
-  const result = await service.build({
-    entryPoints: ['index.js'],
-    bundle: true,
-    write: false,
-    plugins: [unpkgPathPlugin(), fetchPlugin(rawCode)],
-    define: {
-      'process.env.NODE_ENV': '"production"',
-      global: 'window',
-    },
-  });
+  try {
+    const result = await service.build({
+      entryPoints: ['index.js'],
+      bundle: true,
+      write: false,
+      plugins: [unpkgPathPlugin(), fetchPlugin(rawCode)],
+      define: {
+        'process.env.NODE_ENV': '"production"',
+        global: 'window',
+      },
+    });
 
-  // result.outputFiles[0].text is the code string that user inputs in editor
-  return result.outputFiles[0].text;
+    // result.outputFiles[0].text is the code string that user inputs in editor
+    return {
+      code: result.outputFiles[0].text,
+      err: '',
+    };
+  } catch (err) {
+    return {
+      code: '',
+      err: err.message,
+    };
+  }
 };
 
 export default bundle;

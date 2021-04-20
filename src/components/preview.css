@@ -10,6 +10,13 @@
   width: 100%;
 }
 
+.preview-error {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: red;
+}
+
 /* When dragging resize handle body element gets class .react-draggable-transparent-selection. We create a pseudo DOM element after or on top of .preview-wrapper div that wraps iframe. The purpose of this is that as iframe is separated from parent if dragging the resize handle into iframe content the drag event stops. So by creating a pseudo element on top of it we are keeping inside the parents scope and dragging goes smoothly */
 .react-draggable-transparent-selection .preview-wrapper:after {
   content: '';

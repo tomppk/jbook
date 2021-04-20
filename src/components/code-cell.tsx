@@ -9,6 +9,9 @@ const CodeCell = () => {
   // Piece of state for code content inside editor
   const [code, setCode] = useState('');
 
+  // Piece of state for errors
+  const [err, setErr] = useState('');
+
   // input is code that user writes into textarea
   const [input, setInput] = useState('');
 
@@ -16,12 +19,14 @@ const CodeCell = () => {
   // Use debouncing to limit the frequency of preview display refresh and code
   // bundling to 1s
   // Pass in the code that user has inputted inside editor to bundler component
-  // bundler initializes ESbuild takes in input, bundles it and returns bundled
-  // code. This output is then set to code piece of state
+  // bundler initializes ESbuild takes in input, bundles it and returns object
+  // with bundled code and possible error. Output is set to code piece of state
+  // and error piece of state
   useEffect(() => {
     const timer = setTimeout(async () => {
       const output = await bundle(input);
-      setCode(output);
+      setCode(output.code);
+      setErr(output.err);
     }, 1000);
 
     return () => {
@@ -40,7 +45,7 @@ const CodeCell = () => {
             onChange={(value) => setInput(value)}
           />
         </Resizable>
-        <Preview code={code} />
+        <Preview code={code} err={err} />
       </div>
     </Resizable>
   );
