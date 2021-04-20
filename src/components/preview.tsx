@@ -8,6 +8,7 @@ interface PreviewProps {
 // Get our code inside iframe element so it gets executed separately
 // inside iframe with no access to outside iframe for security reasons-
 // Add basic html and div with id="root" ready for React components to use.
+// Add <style> tag directly here to fix background overlap with resize handle
 // Add script with event listener that enables indirect communication between
 // parent element and child iframe
 // Event listener listens for a message from parent element that contains the
@@ -17,7 +18,9 @@ interface PreviewProps {
 // for further investigation
 const html = `
     <html>
-      <head></head>
+      <head>
+        <style> html {background-color: white;}</style>
+      </head>
       <body>
         <div id="root"></div>
         <script>

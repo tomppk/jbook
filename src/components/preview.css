@@ -1,11 +1,13 @@
+/* flex-grow means to try to take as much space as possible without limiting other elements */
 .preview-wrapper {
   position: relative;
   height: 100%;
+  flex-grow: 1;
 }
 
 .preview-wrapper iframe {
   height: 100%;
-  background-color: white;
+  width: 100%;
 }
 
 /* When dragging resize handle body element gets class .react-draggable-transparent-selection. We create a pseudo DOM element after or on top of .preview-wrapper div that wraps iframe. The purpose of this is that as iframe is separated from parent if dragging the resize handle into iframe content the drag event stops. So by creating a pseudo element on top of it we are keeping inside the parents scope and dragging goes smoothly */

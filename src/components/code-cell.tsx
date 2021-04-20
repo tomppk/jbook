@@ -21,13 +21,16 @@ const CodeCell = () => {
   };
 
   // Pass down code state to Preview component
+  // Wrap content with Resizable components to enable editor and preview resizing
   return (
     <Resizable direction="vertical">
       <div style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
-        <CodeEditor
-          initialValue="const a = 1;"
-          onChange={(value) => setInput(value)}
-        />
+        <Resizable direction="horizontal">
+          <CodeEditor
+            initialValue="const a = 1;"
+            onChange={(value) => setInput(value)}
+          />
+        </Resizable>
         <Preview code={code} />
       </div>
     </Resizable>
