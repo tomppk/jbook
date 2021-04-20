@@ -14,9 +14,16 @@ interface ResizableProps {
 // width Infinity is same as 100% so as much space as possible
 // resizeHandles takes array with directions like south on which side to display
 // handles
+// maxConstraints array to limit resizing [horizontal, vertical]
+// vertical set to max 90% of browser window height
 const Resizable: React.FC<ResizableProps> = ({ direction, children }) => {
   return (
-    <ResizableBox height={300} width={Infinity} resizeHandles={['s']}>
+    <ResizableBox
+      minConstraints={[Infinity, 24]}
+      maxConstraints={[Infinity, window.innerHeight * 0.9]}
+      height={300}
+      width={Infinity}
+      resizeHandles={['s']}>
       {children}
     </ResizableBox>
   );
