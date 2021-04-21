@@ -1,13 +1,23 @@
 import './styles/text-editor.css';
 import MDEditor from '@uiw/react-md-editor';
 import React, { useState, useEffect, useRef } from 'react';
+import { Cell } from '../redux';
+import { useActions } from '../hooks/use-actions';
 
-const TextEditor: React.FC = () => {
+interface TextEditorProps {
+  cell: Cell;
+}
+
+const TextEditor: React.FC<TextEditorProps> = ({ cell }) => {
   // Reference to div containing MDEditor in edit mode to know when user clicks
   // inside editor div and prevent event listener closing editor
   const ref = useRef<HTMLDivElement | null>(null);
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState('# Header');
+
+  // Extract updateCell action creator from useActions()
+  // updateCell(id, content) takes in id of cell and content to update
+  // Dispatches action to update redux store state.
+  const { updateCell } = useActions();
 
   useEffect(() => {
     // Callback to close edit mode
@@ -39,13 +49,16 @@ const TextEditor: React.FC = () => {
   }, []);
 
   // If editing is true, render the markdown editor in edit mode.
-  // Set component state to be the value of text inside editor. If there is
+  // Set redux store state to be the value of text inside editor. If there is
   // no text inside set default to be empty string to prevent Typescript
   // undefined error
   if (editing) {
     return (
       <div className="text-editor" ref={ref}>
-        <MDEditor value={value} onChange={(v) => setValue(v || '')} />
+        <MDEditor
+          value={cell.content}
+          onChange={(v) => updateCell(cell.id, v || '')}
+        />
       </div>
     );
   }
@@ -55,10 +68,11 @@ const TextEditor: React.FC = () => {
   // Preview mode value is piece of state value ie. the contents of editor in
   // edit mode
   // Use Bulma card styling to create outline around editor
+  // If cell.content is empty then default value is 'click to edit'
   return (
     <div className="text-editor card" onClick={() => setEditing(true)}>
       <div className="card-content">
-        <MDEditor.Markdown source={value} />
+        <MDEditor.Markdown source={cell.content || 'Click to edit'} />
       </div>
     </div>
   );
