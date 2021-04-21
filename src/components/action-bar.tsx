@@ -1,5 +1,6 @@
 import { useActions } from '../hooks/use-actions';
 import ActionButton from './action-button';
+import './styles/action-bar.css';
 
 // Get id of cell as props
 interface ActionBarProps {
