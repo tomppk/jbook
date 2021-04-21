@@ -4,6 +4,6 @@ export type CellTypes = 'code' | 'cell';
 // Define interface to describe Cell
 export interface Cell {
   id: string;
-  type: 'code' | 'text';
+  type: CellTypes;
   content: string;
 }

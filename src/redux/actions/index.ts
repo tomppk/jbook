@@ -21,10 +21,11 @@ export interface DeleteCellAction {
 }
 
 // Id of cell and type of cell either code or text cell
+// If null then add as last cell
 export interface InsertCellBeforeAction {
   type: ActionType.INSERT_CELL_BEFORE;
   payload: {
-    id: string;
+    id: string | null;
     type: CellTypes;
   };
 }
