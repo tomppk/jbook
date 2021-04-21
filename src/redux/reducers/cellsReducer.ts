@@ -1,3 +1,4 @@
+import produce from 'immer';
 import { ActionType } from '../action-types';
 import { Action } from '../actions';
 import { Cell } from '../cell';
@@ -25,34 +26,22 @@ const initialState: CellsState = {
 // initialState and action. Return value satisfies CellsState interface
 // Reducers always return new state object, not modify previous state object to
 // prevent accidentally referencing the old object
-const reducer = (
-  state: CellsState = initialState,
-  action: Action
-): CellsState => {
-  switch (action.type) {
-    // ...state spread all the existing properties of previous state into
-    // new state object. State structure is defined above initialState.
-    // Define new data property for new state that has all the existing cells
-    // from previous state by spreading previous ...state.data property.
-    // Overwrite the cell contents of cell key or id of [action.payload.id]
 
-    // Then find key [action.payload.id] which is the id of cell we want to update
-    // New value for cell with that particular key will be the previous value
-    // of the cell with that id ...state.date[action.payload.id], except overwrite
-    // content property with action.payload.content
+// Wrap our reducer with Immer produce method to create new state more easily
+// Immer allows to make direct updates to state and produces new state based
+// on those updates
+const reducer = produce((state: CellsState = initialState, action: Action) => {
+  switch (action.type) {
     case ActionType.UPDATE_CELL:
       const { id, content } = action.payload;
+      // Immer allows to directly modify state object and automatically returns
+      // new state object
+      // Find cell with id we want to update from previous redux state and
+      // update its content property with new content from action.payload
+      // Add return; not to fall through to other cases but stop here.
+      state.data[id].content = content;
+      return;
 
-      return {
-        ...state,
-        data: {
-          ...state.data,
-          [id]: {
-            ...state.data[id],
-            content: content,
-          },
-        },
-      };
     case ActionType.DELETE_CELL:
       return state;
     case ActionType.MOVE_CELL:
@@ -62,6 +51,6 @@ const reducer = (
     default:
       return state;
   }
-};
+});
 
 export default reducer;
