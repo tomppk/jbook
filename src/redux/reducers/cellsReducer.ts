@@ -38,9 +38,11 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
       // new state object
       // Find cell with id we want to update from previous redux state and
       // update its content property with new content from action.payload
-      // Add return; not to fall through to other cases but stop here.
+      // Add return state. Immer returns the state automatically so this is
+      // not strictly necessary but if we do not add return state, Typescript will
+      // otherwise infer possible return type as undefined.
       state.data[id].content = content;
-      return;
+      return state;
 
     // Delete cell from data object with id of action.payload
     // Filter state.order array and create new array containing all other id's
@@ -48,7 +50,7 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
     case ActionType.DELETE_CELL:
       delete state.data[action.payload];
       state.order = state.order.filter((id) => id !== action.payload);
-      return;
+      return state;
 
     // Iterate over all id's in array and return index of id we are looking for
     // If direction is 'up' then decrease 1 from index, otherwise add 1
@@ -59,7 +61,7 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
       const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
       if (targetIndex < 0 || targetIndex > state.order.length - 1) {
-        return;
+        return state;
       }
 
       // Move 'id' from targetIndex to index
@@ -67,7 +69,7 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
       // Move 'id' of action.payload ie the cell id we want to move to targetIndex
       state.order[targetIndex] = action.payload.id;
 
-      return;
+      return state;
 
     // Create a new cell of type 'code' or 'text' before cell with given 'id'
     // If 'id' null then add new cell to end of list
