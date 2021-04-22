@@ -1,3 +1,4 @@
+import { Dispatch } from 'redux';
 import { ActionType } from '../action-types';
 import {
   Action,
@@ -5,9 +6,12 @@ import {
   DeleteCellAction,
   MoveCellAction,
   InsertCellAfterAction,
+  BundleStartAction,
+  BundleCompleteAction,
   Direction,
 } from '../actions';
 import { CellTypes } from '../cell';
+import bundle from '../../bundler';
 
 // Annotate return types for specific actions
 // Take in properties, assign them to payload values and return action
@@ -50,5 +54,37 @@ export const insertCellAfter = (
       id,
       type: cellType,
     },
+  };
+};
+
+// Action creator to create bundle. cellId and input that user wrote into editor
+// Async action creator so use dispatch and redux-thunk
+// Can only call dispatch with a real defined Action type
+export const createBundle = (cellId: string, input: string) => {
+  return async (dispatch: Dispatch<Action>) => {
+    // Immediately dispatch action of type bundle start with cellId we want
+    // to bundle
+    dispatch({
+      type: ActionType.BUNDLE_START,
+      payload: {
+        cellId,
+      },
+    });
+
+    // Await the bundled result
+    const result = await bundle(input);
+
+    // After result response is received, dispatch another action of type bundle
+    // complete with payload of bundled code or error
+    dispatch({
+      type: ActionType.BUNDLE_COMPLETE,
+      payload: {
+        cellId,
+        bundle: {
+          code: result.code,
+          err: result.err,
+        },
+      },
+    });
   };
 };
