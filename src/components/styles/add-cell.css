@@ -1,10 +1,18 @@
+/* Transition change opacity from 0 to 1 in 0.3s with ease-in and delay of 0.1s before starting transition */
 .add-cell {
   position: relative;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease-in 0.1s;
+  margin: 10px 0;
 }
 
 .add-cell:hover {
+  opacity: 1;
+}
+
+/* Set opacity to 1 for element that has both these classNames 
+As this is more specific than just .add-cell above, this rule wins and gets applied*/
+.add-cell.force-visible {
   opacity: 1;
 }
 

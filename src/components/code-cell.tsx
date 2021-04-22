@@ -51,9 +51,17 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // Pass down code state to Preview component
   // Wrap content with Resizable components to enable editor and preview resizing
   // updateCell() updates the redux store state
+  // Set height to be 100% of parent less 10px for the resizer handle bar. This
+  // way the resizer handle bar fits into parent as well and does not get pushed
+  // out
   return (
     <Resizable direction="vertical">
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
+      <div
+        style={{
+          height: 'calc(100% - 10px)',
+          display: 'flex',
+          flexDirection: 'row',
+        }}>
         <Resizable direction="horizontal">
           <CodeEditor
             initialValue={cell.content}
