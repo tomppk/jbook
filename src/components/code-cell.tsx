@@ -40,7 +40,36 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     const { data, order } = state.cells;
     const orderedCells = order.map((id) => data[id]);
 
-    const cumulativeCode = [];
+    // Manually add show() function with template string to be the first
+    // code string in cumulativeCode array.
+    // show() displays its parameters inside preview display
+    // If value is object then convert that object into JSON string
+    // If value has $$typeof and props properties then it is a React JSX element
+    // and it needs to be rendered differently. To get this to work code cell
+    // must import both React and ReactDOM. To avoid naming collisions when user
+    // imports React and ReactDOM we name these with underscore and change
+    // ESBuild configuration to use _React.createElement instead to render
+    // JSX element when using show() function
+    const cumulativeCode = [
+      `
+      import _React from 'react';
+      import _ReactDOM from 'react-dom';
+      const show = (value) => {
+        const root = document.querySelector('#root');
+
+        if (typeof value === 'object') {
+          if (value.$$typeof && value.props) {
+            _ReactDOM.render(value, root)
+          } else {
+            root.innerHTML = JSON.stringify(value);
+          } 
+        } else {
+          root.innerHTML = value;
+      }
+    }
+    `,
+    ];
+
     for (let c of orderedCells) {
       if (c.type === 'code') {
         cumulativeCode.push(c.content);
