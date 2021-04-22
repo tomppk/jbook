@@ -9,6 +9,9 @@ import { useActions } from '../hooks/use-actions';
 // Import typed helper hook to allow CodeCell component to directly
 // pull state data from inside our redux store
 import { useTypedSelector } from '../hooks/use-typed-selector';
+// Helper hook to allow referencing code from previous cells and show() method
+// show content inside preview window
+import { useCumulativeCode } from '../hooks/use-cumulative-code';
 
 // Interface to define properties which the props that the parent component
 // passes down into CodeCell component must satisfy
@@ -28,59 +31,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // specified 'id'
   const bundle = useTypedSelector((state) => state.bundles[cell.id]);
 
-  // Cumulated code for the current cell + all the previous cells
-  // Reach into cells piece of state in redux store and pull out
-  // data, order properties.
-  // Map over order and produce ordered array of all the cells we have
-  // including both code and text cells.
-  // Add the content of code cells into cumulativeCode array
-  // If the 'id' of the cell we are currently iterating over matches the id
-  // of our current CodeCell component, break early.
-  const cumulativeCode = useTypedSelector((state) => {
-    const { data, order } = state.cells;
-    const orderedCells = order.map((id) => data[id]);
-
-    // Manually add show() function with template string to be the first
-    // code string in cumulativeCode array.
-    // show() displays its parameters inside preview display
-    // If value is object then convert that object into JSON string
-    // If value has $$typeof and props properties then it is a React JSX element
-    // and it needs to be rendered differently. To get this to work code cell
-    // must import both React and ReactDOM. To avoid naming collisions when user
-    // imports React and ReactDOM we name these with underscore and change
-    // ESBuild configuration to use _React.createElement instead to render
-    // JSX element when using show() function
-    const cumulativeCode = [
-      `
-      import _React from 'react';
-      import _ReactDOM from 'react-dom';
-      const show = (value) => {
-        const root = document.querySelector('#root');
-
-        if (typeof value === 'object') {
-          if (value.$$typeof && value.props) {
-            _ReactDOM.render(value, root)
-          } else {
-            root.innerHTML = JSON.stringify(value);
-          } 
-        } else {
-          root.innerHTML = value;
-      }
-    }
-    `,
-    ];
-
-    for (let c of orderedCells) {
-      if (c.type === 'code') {
-        cumulativeCode.push(c.content);
-      }
-
-      if (c.id === cell.id) {
-        break;
-      }
-    }
-    return cumulativeCode;
-  });
+  const cumulativeCode = useCumulativeCode(cell.id);
 
   // cell.content is the code that user writes into editor
   // Run useEffect whenever input changes ie. cell.content piece of state from
@@ -97,15 +48,14 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     // If there is no bundle, then do not wait 750ms but bundle code instantly
     // This runs bundle immediately at app initialization
     // After following re-renderings add 750ms delay
-    // Join cumulativeCode array of code strings together using newline as
-    // separator, so adds newline after every code string
+
     if (!bundle) {
-      createBundle(cell.id, cumulativeCode.join('\n'));
+      createBundle(cell.id, cumulativeCode);
       return;
     }
 
     const timer = setTimeout(async () => {
-      createBundle(cell.id, cumulativeCode.join('\n'));
+      createBundle(cell.id, cumulativeCode);
     }, 750);
 
     return () => {
@@ -117,7 +67,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
 
     // Disable eslint for next line below
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cumulativeCode.join('\n'), cell.content, createBundle]);
+  }, [cumulativeCode, cell.content, createBundle]);
 
   // Pass down code state to Preview component
   // Wrap content with Resizable components to enable editor and preview resizing
