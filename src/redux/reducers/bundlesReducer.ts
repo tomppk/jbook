@@ -6,12 +6,16 @@ import { Action } from '../actions';
 // Interface to define structure of state that will be returned from reducer
 // An object with key of cell id. Value object with properties loading, code
 // and err. Loading describes whether we are currently bundling code
+// BundleState value can also be undefined when our application first boots up
+// and we do not yet have a bundle for a particular cell
 interface BundlesState {
-  [key: string]: {
-    loading: boolean;
-    code: string;
-    err: string;
-  };
+  [key: string]:
+    | {
+        loading: boolean;
+        code: string;
+        err: string;
+      }
+    | undefined;
 }
 
 // Initialize initial state object as empty object
