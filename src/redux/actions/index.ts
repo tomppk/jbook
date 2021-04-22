@@ -21,9 +21,9 @@ export interface DeleteCellAction {
 }
 
 // Id of cell and type of cell either code or text cell
-// If null then add as last cell
-export interface InsertCellBeforeAction {
-  type: ActionType.INSERT_CELL_BEFORE;
+// If null then add as first cell
+export interface InsertCellAfterAction {
+  type: ActionType.INSERT_CELL_AFTER;
   payload: {
     id: string | null;
     type: CellTypes;
@@ -44,5 +44,5 @@ export interface UpdateCellAction {
 export type Action =
   | MoveCellAction
   | DeleteCellAction
-  | InsertCellBeforeAction
+  | InsertCellAfterAction
   | UpdateCellAction;

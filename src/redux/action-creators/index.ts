@@ -4,7 +4,7 @@ import {
   UpdateCellAction,
   DeleteCellAction,
   MoveCellAction,
-  InsertCellBeforeAction,
+  InsertCellAfterAction,
   Direction,
 } from '../actions';
 import { CellTypes } from '../cell';
@@ -38,14 +38,14 @@ export const moveCell = (id: string, direction: Direction): MoveCellAction => {
   };
 };
 
-// Id can be null if there is no cell before ie. we are inserting last cell
-// at end of list
-export const insertCellBefore = (
+// Id can be null if there is no cell. Then we insert new cell at the start
+// of array.
+export const insertCellAfter = (
   id: string | null,
   cellType: CellTypes
-): InsertCellBeforeAction => {
+): InsertCellAfterAction => {
   return {
-    type: ActionType.INSERT_CELL_BEFORE,
+    type: ActionType.INSERT_CELL_AFTER,
     payload: {
       id,
       type: cellType,
