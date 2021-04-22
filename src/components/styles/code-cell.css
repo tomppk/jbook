@@ -1,0 +1,32 @@
+/* <div> that always shows white background and does not fade out with the animation of opacity 0 and show the dark background behind. So no matter what is inside the right preview window of iframe it always shows white background*/
+.progress-wrapper {
+  height: 100%;
+  flex-grow: 1;
+  background-color: white;
+}
+
+/* Styling for <div> to hold progress bar.
+ Animation: any time an element appears into the DOM with className of .progress-cover, we want to apply animation of fadeIn to it over a period of 0.5s.
+ This means that if the bundling takes less than .0.25s the user will not see the progress bar at all */
+.progress-cover {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 10%;
+  padding-right: 10%;
+  animation: fadeIn 0.5s;
+}
+
+/* This defines the animation called fadeIn. When animation first starts 0% we want to apply opacity of 0 to element. Opacity stays 0 until 50% of animation duration so at 0.25s. Then after 0.25s we want to linearly transition opacity up to 1 */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

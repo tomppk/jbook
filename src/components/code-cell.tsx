@@ -1,3 +1,4 @@
+import './styles/code-cell.css';
 import { useEffect } from 'react';
 import CodeEditor from './code-editor';
 import Preview from './preview';
@@ -34,10 +35,19 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // bundling to 1s
   // Pass in the code that user has inputted inside editor to createBundle()
   // action creator.
+  // createBundle() action creator calls bundler to bundle input code
+  // and updates redux store state
   // bundler initializes ESbuild takes in input, bundles it and returns object
-  // with bundled code and possible error. Output is set to code piece of state
-  // and error piece of state
+  // with bundled code and possible error.
   useEffect(() => {
+    // If there is no bundle, then do not wait 750ms but bundle code instantly
+    // This runs bundle immediately at app initialization
+    // After following re-renderings add 750ms delay
+    if (!bundle) {
+      createBundle(cell.id, cell.content);
+      return;
+    }
+
     const timer = setTimeout(async () => {
       createBundle(cell.id, cell.content);
     }, 750);
@@ -45,7 +55,11 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     return () => {
       clearTimeout(timer);
     };
-  }, [cell.id, cell.content]);
+    // Disable eslint so it does not give error of missing dependency of 'bundle'
+    // below inside depencies list. If we would add 'bundle' it would cause
+    // useEffect() to enter into infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cell.id, cell.content, createBundle]);
 
   // Pass down code state to Preview component
   // Wrap content with Resizable components to enable editor and preview resizing
@@ -53,7 +67,11 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // Set height to be 100% of parent less 10px for the resizer handle bar. This
   // way the resizer handle bar fits into parent as well and does not get pushed
   // out
-  // Do not show <Preview> if bundle is not yet defined
+  // If there is no bundle or bundle.loading then display <progress> bar HTML
+  // element with classNames from Bulma to add it styling.
+  // Add custom CSS to class "progress-cover" to show and position progress bar
+  // correctly
+  // Otherwise display <Preview> component
   return (
     <Resizable direction="vertical">
       <div
@@ -68,7 +86,17 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             onChange={(value) => updateCell(cell.id, value)}
           />
         </Resizable>
-        {bundle && <Preview code={bundle.code} err={bundle.err} />}
+        <div className="progress-wrapper">
+          {!bundle || bundle.loading ? (
+            <div className="progress-cover">
+              <progress className="progress is-small is-primary" max="100">
+                Loading
+              </progress>
+            </div>
+          ) : (
+            <Preview code={bundle.code} err={bundle.err} />
+          )}
+        </div>
       </div>
     </Resizable>
   );

@@ -1,5 +1,4 @@
 import produce from 'immer';
-import { Statement } from 'jscodeshift';
 import { ActionType } from '../action-types';
 import { Action } from '../actions';
 
