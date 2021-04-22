@@ -25,19 +25,19 @@ const CellList: React.FC = () => {
   // is written as <Fragment>
   const renderedCells = cells.map((cell) => (
     <Fragment key={cell.id}>
-      <AddCell nextCellId={cell.id} />
       <CellListItem cell={cell} />
+      <AddCell previousCellId={cell.id} />
     </Fragment>
   ));
 
-  // Render AddCell to end of list and give cell 'id' of null as there is no
-  // cell and 'id' at the end of list
+  // Render AddCell to start of list and give cell 'id' of null as
+  // there is no previous cell
   // If there are no cells on the screen or inside cells array
   // then forceVisible is true and we set AddCell opacity to 1 instead of faded out
   return (
     <div>
+      <AddCell forceVisible={cells.length === 0} previousCellId={null} />
       {renderedCells}
-      <AddCell forceVisible={cells.length === 0} nextCellId={null} />
     </div>
   );
 };
