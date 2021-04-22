@@ -38,8 +38,10 @@ export const moveCell = (id: string, direction: Direction): MoveCellAction => {
   };
 };
 
+// Id can be null if there is no cell before ie. we are inserting last cell
+// at end of list
 export const insertCellBefore = (
-  id: string,
+  id: string | null,
   cellType: CellTypes
 ): InsertCellBeforeAction => {
   return {

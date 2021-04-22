@@ -1,6 +1,8 @@
+import { Fragment } from 'react';
 import { useTypedSelector } from '../hooks/use-typed-selector';
 import React from 'react';
 import CellListItem from './cell-list-item';
+import AddCell from './add-cell';
 
 const CellList: React.FC = () => {
   // Destructure from redux state cells property and more specifically order and
@@ -16,11 +18,26 @@ const CellList: React.FC = () => {
   // Map over all the cell objects and for each cell create a CellListItem
   // component and pass that cell down as props
   // Always add key prop for list items
+  // Wrap components inside React Fragment instead of <div> to prevent
+  // unnecessary rendering of extra <div> to DOM
+  // React Fragment can be written as empty <> or import Fragment and
+  // write as <Fragment>. It can only take in props like key={} if it
+  // is written as <Fragment>
   const renderedCells = cells.map((cell) => (
-    <CellListItem key={cell.id} cell={cell} />
+    <Fragment key={cell.id}>
+      <AddCell nextCellId={cell.id} />
+      <CellListItem cell={cell} />
+    </Fragment>
   ));
 
-  return <div>{renderedCells}</div>;
+  // Render AddCell to end of list and give cell 'id' of null as there is no
+  // cell and 'id' at the end of list
+  return (
+    <div>
+      {renderedCells}
+      <AddCell nextCellId={null} />
+    </div>
+  );
 };
 
 export default CellList;
