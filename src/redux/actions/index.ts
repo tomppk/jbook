@@ -39,10 +39,33 @@ export interface UpdateCellAction {
   };
 }
 
+// Id of cell where bundling was started
+export interface BundleStartAction {
+  type: ActionType.BUNDLE_START;
+  payload: {
+    cellId: string;
+  };
+}
+
+// Id of cell for which bundling process was completed
+// Bundle output that contains bundled code and possible errors
+export interface BundleCompleteAction {
+  type: ActionType.BUNDLE_COMPLETE;
+  payload: {
+    cellId: string;
+    bundle: {
+      code: string;
+      err: string;
+    };
+  };
+}
+
 // Export Action which is a union of all our actions so contains all possible
 // actions for Typescript to check that only these actions are allowed
 export type Action =
   | MoveCellAction
   | DeleteCellAction
   | InsertCellAfterAction
-  | UpdateCellAction;
+  | UpdateCellAction
+  | BundleStartAction
+  | BundleCompleteAction;
