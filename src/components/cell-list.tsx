@@ -1,3 +1,4 @@
+import './styles/cell-list.css';
 import { Fragment } from 'react';
 import { useTypedSelector } from '../hooks/use-typed-selector';
 import React from 'react';
@@ -35,7 +36,7 @@ const CellList: React.FC = () => {
   // If there are no cells on the screen or inside cells array
   // then forceVisible is true and we set AddCell opacity to 1 instead of faded out
   return (
-    <div>
+    <div className="cell-list">
       <AddCell forceVisible={cells.length === 0} previousCellId={null} />
       {renderedCells}
     </div>

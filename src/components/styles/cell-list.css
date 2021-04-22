@@ -1,0 +1,9 @@
+/* Add 25vh so quarter of a screen of empty space to bottom of screen. This way user can scroll a bit past last cell and there is some room. */
+.cell-list {
+  margin: 0 25px 25vh;
+}
+
+/* Whenever we drag or resize component body element automatically gets this className. Whenever user is dragging element we want to add extra bottom margin to cell-list component to prevent last code cell from quickly snapping shut or open */
+.react-draggable-transparent-selection .cell-list {
+  margin-bottom: 100vh;
+}
