@@ -28,6 +28,31 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // specified 'id'
   const bundle = useTypedSelector((state) => state.bundles[cell.id]);
 
+  // Cumulated code for the current cell + all the previous cells
+  // Reach into cells piece of state in redux store and pull out
+  // data, order properties.
+  // Map over order and produce ordered array of all the cells we have
+  // including both code and text cells.
+  // Add the content of code cells into cumulativeCode array
+  // If the 'id' of the cell we are currently iterating over matches the id
+  // of our current CodeCell component, break early.
+  const cumulativeCode = useTypedSelector((state) => {
+    const { data, order } = state.cells;
+    const orderedCells = order.map((id) => data[id]);
+
+    const cumulativeCode = [];
+    for (let c of orderedCells) {
+      if (c.type === 'code') {
+        cumulativeCode.push(c.content);
+      }
+
+      if (c.id === cell.id) {
+        break;
+      }
+    }
+    return cumulativeCode;
+  });
+
   // cell.content is the code that user writes into editor
   // Run useEffect whenever input changes ie. cell.content piece of state from
   // redux store
@@ -43,13 +68,15 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     // If there is no bundle, then do not wait 750ms but bundle code instantly
     // This runs bundle immediately at app initialization
     // After following re-renderings add 750ms delay
+    // Join cumulativeCode array of code strings together using newline as
+    // separator, so adds newline after every code string
     if (!bundle) {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode.join('\n'));
       return;
     }
 
     const timer = setTimeout(async () => {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode.join('\n'));
     }, 750);
 
     return () => {
@@ -58,8 +85,10 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     // Disable eslint so it does not give error of missing dependency of 'bundle'
     // below inside depencies list. If we would add 'bundle' it would cause
     // useEffect() to enter into infinite loop
+
+    // Disable eslint for next line below
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cell.id, cell.content, createBundle]);
+  }, [cumulativeCode.join('\n'), cell.content, createBundle]);
 
   // Pass down code state to Preview component
   // Wrap content with Resizable components to enable editor and preview resizing
