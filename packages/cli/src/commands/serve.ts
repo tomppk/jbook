@@ -22,7 +22,7 @@ import { serve } from 'local-api';
 // Action function receives as first argument optional value from .command
 // Second argument object containing different options
 // Execute serve(port, filename, directory) function defined in 'local-api'
-// package
+// package. serve() is async function as it is wrapped inside Promise.
 
 // process.cwd() returns absolute path to directory where user ran the
 // command from eg. home/projects/tbook/packages/cli
@@ -37,9 +37,25 @@ export const serveCommand = new Command()
   .command('serve [filename]')
   .description('Open a file for editing')
   .option('-p, --port <number>', 'port to run server on', '4005')
-  .action((filename = 'notebook.js', options: { port: string }) => {
-    const dir = path.join(process.cwd(), path.dirname(filename));
-    serve(parseInt(options.port), path.basename(filename), dir);
+  .action(async (filename = 'notebook.js', options: { port: string }) => {
+    try {
+      const dir = path.join(process.cwd(), path.dirname(filename));
+      await serve(parseInt(options.port), path.basename(filename), dir);
+      console.log(
+        `Opened ${filename}. Navigate to http://localhost:${options.port} to edit the file.`
+      );
+    } catch (err) {
+      if (err.code === 'EADDRINUSE') {
+        console.error(
+          'Port is in use. Try running on different port.\n(use "serve [filename] --port <number>" to change port.)'
+        );
+      } else {
+        console.log('Error! Something went wrong:', err.message);
+      }
+      // If end up in catch error block then forcibly exit program
+      // exit with status code 1: exiting with unsuccessful run of program
+      process.exit(1);
+    }
   });
 
 // To run command from command line node index.js serve
