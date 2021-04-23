@@ -33,6 +33,12 @@ import { serve } from 'local-api';
 // These two directory paths are joined together to get final path
 // path.basename(filename) returns just filename from relative path
 
+// Add script to replace process.env.NODE_ENV with 'production' before pushing
+// code to npm. When user gets this package from npm isProduction = true.
+// If running on local dev environment NODE_ENV is likely not set or 'development'
+// so isProduction = false and we do not want to useProxy at local-api
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const serveCommand = new Command()
   .command('serve [filename]')
   .description('Open a file for editing')
@@ -40,7 +46,12 @@ export const serveCommand = new Command()
   .action(async (filename = 'notebook.js', options: { port: string }) => {
     try {
       const dir = path.join(process.cwd(), path.dirname(filename));
-      await serve(parseInt(options.port), path.basename(filename), dir);
+      await serve(
+        parseInt(options.port),
+        path.basename(filename),
+        dir,
+        !isProduction
+      );
       console.log(
         `Opened ${filename}. Navigate to http://localhost:${options.port} to edit the file.`
       );

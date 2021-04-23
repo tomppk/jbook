@@ -69,6 +69,11 @@ var local_api_1 = require("local-api");
 // inputted then returns empty string ''
 // These two directory paths are joined together to get final path
 // path.basename(filename) returns just filename from relative path
+// Add script to replace process.env.NODE_ENV with 'production' before pushing
+// code to npm. When user gets this package from npm isProduction = true.
+// If running on local dev environment NODE_ENV is likely not set or 'development'
+// so isProduction = false and we do not want to useProxy at local-api
+var isProduction = process.env.NODE_ENV === 'production';
 exports.serveCommand = new commander_1.Command()
     .command('serve [filename]')
     .description('Open a file for editing')
@@ -82,7 +87,7 @@ exports.serveCommand = new commander_1.Command()
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     dir = path_1.default.join(process.cwd(), path_1.default.dirname(filename));
-                    return [4 /*yield*/, local_api_1.serve(parseInt(options.port), path_1.default.basename(filename), dir)];
+                    return [4 /*yield*/, local_api_1.serve(parseInt(options.port), path_1.default.basename(filename), dir, !isProduction)];
                 case 1:
                     _a.sent();
                     console.log("Opened " + filename + ". Navigate to http://localhost:" + options.port + " to edit the file.");
