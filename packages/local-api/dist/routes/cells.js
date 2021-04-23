@@ -41,17 +41,65 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCellsRouter = void 0;
 var express_1 = __importDefault(require("express"));
+// Default Node module for saving/loading files off of hard drive
+// import submodule /promises to be able to write async/await code and not
+// need to use callbacks
+var promises_1 = __importDefault(require("fs/promises"));
+var path_1 = __importDefault(require("path"));
 var createCellsRouter = function (filename, dir) {
     // Add routes to Router object and merge it back into our app at index.ts
     var router = express_1.default.Router();
+    // Use body parsing middleware to enable parsing JSON from req.body
+    router.use(express_1.default.json);
+    // Create full path name by combining dir and filename
+    var fullPath = path_1.default.join(dir, filename);
     router.get('/cells', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        var result, err_1;
         return __generator(this, function (_a) {
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 6]);
+                    return [4 /*yield*/, promises_1.default.readFile(fullPath, { encoding: 'utf-8' })];
+                case 1:
+                    result = _a.sent();
+                    res.send(JSON.parse(result));
+                    return [3 /*break*/, 6];
+                case 2:
+                    err_1 = _a.sent();
+                    if (!(err_1.code === 'ENOENT')) return [3 /*break*/, 4];
+                    // Create a file and add default cells as empty array
+                    // Send response of empty array ie. no cells back to the browser
+                    return [4 /*yield*/, promises_1.default.writeFile(fullPath, '[]', 'utf-8')];
+                case 3:
+                    // Create a file and add default cells as empty array
+                    // Send response of empty array ie. no cells back to the browser
+                    _a.sent();
+                    res.send([]);
+                    return [3 /*break*/, 5];
+                case 4: throw err_1;
+                case 5: return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
+            }
         });
     }); });
+    // Route to save code and text cells into a file at local file system
     router.post('/cells', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        var cells;
         return __generator(this, function (_a) {
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    cells = req.body.cells;
+                    // Write the cells into the file at fullPath by converting Javascript objects
+                    // into JSON strings with standard 'utf-8' encoding ie. plain text
+                    return [4 /*yield*/, promises_1.default.writeFile(fullPath, JSON.stringify(cells), 'utf-8')];
+                case 1:
+                    // Write the cells into the file at fullPath by converting Javascript objects
+                    // into JSON strings with standard 'utf-8' encoding ie. plain text
+                    _a.sent();
+                    // Send back response
+                    res.send({ status: 'ok' });
+                    return [2 /*return*/];
+            }
         });
     }); });
     return router;
