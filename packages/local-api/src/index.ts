@@ -1,6 +1,7 @@
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import path from 'path';
+import { createCellsRouter } from './routes/cells';
 
 export const serve = (
   port: number,
@@ -50,6 +51,9 @@ export const serve = (
     const packagePath = require.resolve('local-client/build/index.html');
     app.use(express.static(path.dirname(packagePath)));
   }
+
+  // Wire up and create express router with our routes and pass in file and dir
+  app.use(createCellsRouter(filename, dir));
 
   // Wrap starting express server listening inside a custom Promise to enable
   // async error handling in CLI.
