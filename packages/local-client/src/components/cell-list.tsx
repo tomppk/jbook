@@ -1,20 +1,27 @@
 import './styles/cell-list.css';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useTypedSelector } from '../hooks/use-typed-selector';
 import React from 'react';
 import CellListItem from './cell-list-item';
 import AddCell from './add-cell';
+import { useActions } from '../hooks/use-actions';
 
 const CellList: React.FC = () => {
   // Destructure from redux state cells property and more specifically order and
   // data properties of cells.
   // Map over order array and for each 'id' return the cell with that id as key
   // from data object
-  const cells = useTypedSelector(({ cells: { order, data } }) => {
-    return order.map((id) => {
-      return data[id];
-    });
-  });
+  const cells = useTypedSelector(({ cells: { order, data } }) =>
+    order.map((id) => data[id])
+  );
+
+  // Get access to fetchCells action from redux side of app
+  const { fetchCells } = useActions();
+
+  // Retrieve a list of cells from api when component is first rendered
+  useEffect(() => {
+    fetchCells();
+  }, []);
 
   // Map over all the cell objects and for each cell create a CellListItem
   // component and pass that cell down as props

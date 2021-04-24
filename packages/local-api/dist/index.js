@@ -11,9 +11,8 @@ var cells_1 = require("./routes/cells");
 var serve = function (port, filename, dir, useProxy) {
     var app = express_1.default();
     // Wire up and create express router with our routes and pass in file and dir
-    // This router code line needs to be above useProxy. We check first whether
-    // request matches any of our routes defined in router. If it does not match
-    // only then we will fall through to proxy middleware.
+    // Have this line before useProxy so we can check if request matches our routes
+    // If there is no match, only then fall through to proxy middleware
     app.use(cells_1.createCellsRouter(filename, dir));
     // useProxy checks if we are doing local development or running on
     // a user's machine.

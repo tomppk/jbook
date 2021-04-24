@@ -138,7 +138,7 @@ export const saveCells = () => {
     // Make post request to '/cells' with an object that has cells property
     // that contains an array of Cell objects
     try {
-      await axios.post('/cells', { cells: cells });
+      await axios.post('/cells', { cells });
     } catch (err) {
       dispatch({
         type: ActionType.SAVE_CELLS_ERROR,

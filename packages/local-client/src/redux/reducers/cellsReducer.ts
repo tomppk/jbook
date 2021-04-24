@@ -35,6 +35,7 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
     // If error while saving cells list then state.err will be the error message
     case ActionType.SAVE_CELLS_ERROR:
       state.error = action.payload;
+
       return state;
 
     // When fetching cells set loading true and error null to reset any previous
@@ -42,6 +43,7 @@ const reducer = produce((state: CellsState = initialState, action: Action) => {
     case ActionType.FETCH_CELLS:
       state.loading = true;
       state.error = null;
+
       return state;
 
     // Response we got back is an array of Cell objects. New state.order array

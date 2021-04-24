@@ -12,9 +12,8 @@ export const serve = (
   const app = express();
 
   // Wire up and create express router with our routes and pass in file and dir
-  // This router code line needs to be above useProxy. We check first whether
-  // request matches any of our routes defined in router. If it does not match
-  // only then we will fall through to proxy middleware.
+  // Have this line before useProxy so we can check if request matches our routes
+  // If there is no match, only then fall through to proxy middleware
   app.use(createCellsRouter(filename, dir));
 
   // useProxy checks if we are doing local development or running on
@@ -30,7 +29,6 @@ export const serve = (
   // ws: enable websocket support. Create-react-app uses websocket by default
   // to tell browser that some file has changed.
   // logLevel: 'silent' disables logging to console
-
   if (useProxy) {
     app.use(
       createProxyMiddleware({

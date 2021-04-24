@@ -50,7 +50,7 @@ var createCellsRouter = function (filename, dir) {
     // Add routes to Router object and merge it back into our app at index.ts
     var router = express_1.default.Router();
     // Use body parsing middleware to enable parsing JSON from req.body
-    router.use(express_1.default.json);
+    // router.use(express.json);
     // Create full path name by combining dir and filename
     var fullPath = path_1.default.join(dir, filename);
     router.get('/cells', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
