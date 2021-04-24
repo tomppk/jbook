@@ -1,10 +1,10 @@
 import { ActionType } from '../action-types';
-import { CellTypes } from '../cell';
+import { Cell, CellTypes } from '../cell';
 
 // Define type for direction cells can move
 export type Direction = 'up' | 'down';
 
-// Define interfaces for each action
+// Define interfaces for each action to describe their structure/content
 // MoveCell id of cell we want to move, direction where to move
 export interface MoveCellAction {
   type: ActionType.MOVE_CELL;
@@ -60,6 +60,23 @@ export interface BundleCompleteAction {
   };
 }
 
+// No payload as just make a fetch request
+export interface FetchCellsAction {
+  type: ActionType.FETCH_CELLS;
+}
+
+// Payload response we get back ie. array of Cell objects
+export interface FetchCellsCompleteAction {
+  type: ActionType.FETCH_CELLS_COMPLETE;
+  payload: Cell[];
+}
+
+// Payload error string we get back
+export interface FetchCellsErrorAction {
+  type: ActionType.FETCH_CELLS_ERROR;
+  payload: string;
+}
+
 // Export Action which is a union of all our actions so contains all possible
 // actions for Typescript to check that only these actions are allowed
 export type Action =
@@ -68,4 +85,7 @@ export type Action =
   | InsertCellAfterAction
   | UpdateCellAction
   | BundleStartAction
-  | BundleCompleteAction;
+  | BundleCompleteAction
+  | FetchCellsAction
+  | FetchCellsCompleteAction
+  | FetchCellsErrorAction;

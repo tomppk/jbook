@@ -1,4 +1,5 @@
 import produce from 'immer';
+import CellList from '../../components/cell-list';
 import { ActionType } from '../action-types';
 import { Action } from '../actions';
 import { Cell } from '../cell';
@@ -32,6 +33,43 @@ const initialState: CellsState = {
 // on those updates
 const reducer = produce((state: CellsState = initialState, action: Action) => {
   switch (action.type) {
+    // When fetching cells set loading true and error null to reset any previous
+    // errors
+    case ActionType.FETCH_CELLS:
+      state.loading = true;
+      state.error = null;
+      return state;
+
+    // Response we got back is an array of Cell objects. New state.order array
+    // is created by mapping over response array and returning 'id' string
+    // of each Cell object in correct order.
+    // reduce() is similar to map() but rather than creating a new array it
+    // will iterate over each item and run callback on each to add in new
+    // data.
+    // New state.data is created using reduce().
+    // accumulator or acc initial value is empty object of type CellsState 'data'
+    // property so {} as CellsState['data']
+    // Iterate over each cell in cells array from action.payload. For each cell
+    // create a new key:value pair inside the acc object with cell.id as key
+    // and the Cell object as value just like defined in interface CellsState.data
+    // return acc object. This new object with key:values of cells is updated
+    // redux store state.data
+    case ActionType.FETCH_CELLS_COMPLETE:
+      state.order = action.payload.map((cell) => cell.id);
+      state.data = action.payload.reduce((acc, cell) => {
+        acc[cell.id] = cell;
+        return acc;
+      }, {} as CellsState['data']);
+
+      return state;
+
+    // No longer loading, error set to err.message we got from response and
+    // and which is in action.payload of FETCH_CELLS_ERROR action type
+    case ActionType.FETCH_CELLS_ERROR:
+      state.loading = false;
+      state.error = action.payload;
+      return state;
+
     case ActionType.UPDATE_CELL:
       const { id, content } = action.payload;
       // Immer allows to directly modify state object and automatically returns
