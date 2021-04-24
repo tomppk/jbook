@@ -39,9 +39,6 @@ export const createCellsRouter = (filename: string, dir: string) => {
         throw err;
       }
     }
-
-    // Parse a list of cells out of it
-    // Send list of cells back to browser
   });
 
   // Route to save code and text cells into a file at local file system

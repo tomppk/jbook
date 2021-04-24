@@ -11,6 +11,12 @@ export const serve = (
 ) => {
   const app = express();
 
+  // Wire up and create express router with our routes and pass in file and dir
+  // This router code line needs to be above useProxy. We check first whether
+  // request matches any of our routes defined in router. If it does not match
+  // only then we will fall through to proxy middleware.
+  app.use(createCellsRouter(filename, dir));
+
   // useProxy checks if we are doing local development or running on
   // a user's machine.
   // This way of serving React assets is intended when we are running in
@@ -51,9 +57,6 @@ export const serve = (
     const packagePath = require.resolve('local-client/build/index.html');
     app.use(express.static(path.dirname(packagePath)));
   }
-
-  // Wire up and create express router with our routes and pass in file and dir
-  app.use(createCellsRouter(filename, dir));
 
   // Wrap starting express server listening inside a custom Promise to enable
   // async error handling in CLI.
