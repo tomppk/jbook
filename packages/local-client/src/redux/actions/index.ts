@@ -60,20 +60,29 @@ export interface BundleCompleteAction {
   };
 }
 
-// No payload as just make a fetch request
+// No payload. Just an action type to set loading true and reset errors
+// inside action-creator
 export interface FetchCellsAction {
   type: ActionType.FETCH_CELLS;
 }
 
-// Payload response we get back ie. array of Cell objects
+// Payload is response we get back ie. array of Cell objects when we made a
+// successful get request to api to fetch a list of cells
 export interface FetchCellsCompleteAction {
   type: ActionType.FETCH_CELLS_COMPLETE;
   payload: Cell[];
 }
 
-// Payload error string we get back
+// Payload is error string we get back if there was error while fetching list
+// of cells from api
 export interface FetchCellsErrorAction {
   type: ActionType.FETCH_CELLS_ERROR;
+  payload: string;
+}
+
+// Payload is error string we get back if something went wrong while saving
+export interface SaveCellsErrorAction {
+  type: ActionType.SAVE_CELLS_ERROR;
   payload: string;
 }
 
@@ -88,4 +97,5 @@ export type Action =
   | BundleCompleteAction
   | FetchCellsAction
   | FetchCellsCompleteAction
-  | FetchCellsErrorAction;
+  | FetchCellsErrorAction
+  | SaveCellsErrorAction;

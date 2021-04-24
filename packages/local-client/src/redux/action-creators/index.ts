@@ -7,13 +7,11 @@ import {
   DeleteCellAction,
   MoveCellAction,
   InsertCellAfterAction,
-  FetchCellsAction,
-  FetchCellsCompleteAction,
-  FetchCellsErrorAction,
   Direction,
 } from '../actions';
 import { Cell, CellTypes } from '../cell';
 import bundle from '../../bundler';
+import { RootState } from '../reducers';
 
 // Annotate return types for specific actions
 // Take in properties, assign them to payload values and return action
@@ -113,6 +111,37 @@ export const fetchCells = () => {
     } catch (err) {
       dispatch({
         type: ActionType.FETCH_CELLS_ERROR,
+        payload: err.message,
+      });
+    }
+  };
+};
+
+// Return async function that is called with dispatch
+// Second argument for redux-thunk function is getState that will return
+// the current state of redux store. We can reach into state and get out order
+// and data properties. getState type is function that will return our RootState
+// object which describes all the state inside redux store
+export const saveCells = () => {
+  return async (dispatch: Dispatch<Action>, getState: () => RootState) => {
+    // Destructure cells property by calling getState() to get current redux state
+    const {
+      cells: { data, order },
+    } = getState();
+
+    // Combine together data and order to create a new array called cells
+    // that contains all the Cell objects in correct order
+    // Map over order array to get cell 'id's and look up that id in 'data'
+    // and add that Cell object value into cells array
+    const cells = order.map((id) => data[id]);
+
+    // Make post request to '/cells' with an object that has cells property
+    // that contains an array of Cell objects
+    try {
+      await axios.post('/cells', { cells: cells });
+    } catch (err) {
+      dispatch({
+        type: ActionType.SAVE_CELLS_ERROR,
         payload: err.message,
       });
     }

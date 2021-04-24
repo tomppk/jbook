@@ -1,5 +1,4 @@
 import produce from 'immer';
-import CellList from '../../components/cell-list';
 import { ActionType } from '../action-types';
 import { Action } from '../actions';
 import { Cell } from '../cell';
@@ -33,6 +32,11 @@ const initialState: CellsState = {
 // on those updates
 const reducer = produce((state: CellsState = initialState, action: Action) => {
   switch (action.type) {
+    // If error while saving cells list then state.err will be the error message
+    case ActionType.SAVE_CELLS_ERROR:
+      state.error = action.payload;
+      return state;
+
     // When fetching cells set loading true and error null to reset any previous
     // errors
     case ActionType.FETCH_CELLS:
