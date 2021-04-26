@@ -15,13 +15,17 @@ const CellList: React.FC = () => {
     order.map((id) => data[id])
   );
 
-  // Get access to fetchCells action from redux side of app
-  const { fetchCells } = useActions();
+  // Get access to fetchCells and saveCells action creators from redux side of app
+  const { fetchCells, saveCells } = useActions();
 
   // Retrieve a list of cells from api when component is first rendered
   useEffect(() => {
     fetchCells();
   }, []);
+
+  // useEffect(() => {
+  //   saveCells();
+  // }, [JSON.stringify(cells)]);
 
   // Map over all the cell objects and for each cell create a CellListItem
   // component and pass that cell down as props
