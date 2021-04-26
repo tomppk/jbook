@@ -48,7 +48,7 @@ var serve = function (port, filename, dir, useProxy) {
         // localhost:4005/index.html
         // This way of serving up React assets is intended when user has CLI installed
         // to local machine.
-        var packagePath = require.resolve('local-client/build/index.html');
+        var packagePath = require.resolve('@tbook/local-client/build/index.html');
         app.use(express_1.default.static(path_1.default.dirname(packagePath)));
     }
     // Wrap starting express server listening inside a custom Promise to enable

@@ -45,7 +45,7 @@ exports.serveCommand = void 0;
 var path_1 = __importDefault(require("path"));
 // Command() creates instance of command for us to implement
 var commander_1 = require("commander");
-var local_api_1 = require("local-api");
+var local_api_1 = require("@tbook/local-api");
 // Create instance of Command() from commander library designed to help building
 // CLI tools. Chain on method calls to customize the Command object.
 // command('nameOfCommand') defines what command we want to watch for. When user
