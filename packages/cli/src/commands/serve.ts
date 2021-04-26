@@ -3,7 +3,7 @@
 import path from 'path';
 // Command() creates instance of command for us to implement
 import { Command } from 'commander';
-import { serve } from 'local-api';
+import { serve } from '@tbook/local-api';
 
 // Create instance of Command() from commander library designed to help building
 // CLI tools. Chain on method calls to customize the Command object.

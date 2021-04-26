@@ -52,7 +52,7 @@ export const serve = (
     // localhost:4005/index.html
     // This way of serving up React assets is intended when user has CLI installed
     // to local machine.
-    const packagePath = require.resolve('local-client/build/index.html');
+    const packagePath = require.resolve('@tbook/local-client/build/index.html');
     app.use(express.static(path.dirname(packagePath)));
   }
   // Wrap starting express server listening inside a custom Promise to enable
