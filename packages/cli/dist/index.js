@@ -1,5 +1,7 @@
+#!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// Above line enables running executable without typing node
 var commander_1 = require("commander");
 var serve_1 = require("./commands/serve");
 // Associate commands together

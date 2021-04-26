@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+// Above line enables running executable without typing node
 import { program } from 'commander';
 import { serveCommand } from './commands/serve';
 
