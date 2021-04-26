@@ -55,7 +55,6 @@ export const serve = (
     const packagePath = require.resolve('local-client/build/index.html');
     app.use(express.static(path.dirname(packagePath)));
   }
-
   // Wrap starting express server listening inside a custom Promise to enable
   // async error handling in CLI.
   // The Promise will be resolved or rejected at some point in time.

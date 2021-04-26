@@ -1,1 +1,1 @@
-[]
+[{"content":"# Heading\n\nYour notes here...","type":"text","id":"hox8g"},{"content":"show(\"Hello, World!\")","type":"code","id":"siifu"}]

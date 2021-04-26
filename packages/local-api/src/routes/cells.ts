@@ -13,9 +13,9 @@ interface Cell {
 
 export const createCellsRouter = (filename: string, dir: string) => {
   // Add routes to Router object and merge it back into our app at index.ts
-  const router = express.Router();
   // Use body parsing middleware to enable parsing JSON from req.body
-  router.use(express.json);
+  const router = express.Router();
+  router.use(express.json());
 
   // Create full path name by combining dir and filename
   const fullPath = path.join(dir, filename);
