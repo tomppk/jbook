@@ -1,4 +1,6 @@
 # Tbook
+Massive React and Typescript sample project for Udemy's React and Typescript project course. Not accessible as **npm package** at the moment. Needs debugging...
+
 Interactive coding environment that runs inside browser. Can be run using **npx tbook serve** and then accessing http://localhost:4005 in browser.
 
 ## Features:
